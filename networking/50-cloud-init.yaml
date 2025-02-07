@@ -1,0 +1,17 @@
+network:
+  ethernets: {}
+  version: 2
+  renderer: networkd
+  wifis:
+    wlp0s20f3:
+      addresses: [192.168.0.20/24]
+      nameservers:
+        addresses: [192.168.0.1, 8.8.8.8]
+      access-points:
+        "network_ssid_name":
+          password: "******"
+      routes:
+        - to: default
+          via: 192.168.0.1
+      dhcp4: no
+      dhcp6: no
