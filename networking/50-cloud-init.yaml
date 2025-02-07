@@ -1,3 +1,4 @@
+# To configure an static IP for the server: 192.168.0.20
 network:
   ethernets: {}
   version: 2
