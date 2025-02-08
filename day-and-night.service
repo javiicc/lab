@@ -1,0 +1,17 @@
+[Unit]
+Description=Turn off and on screen on lid state changes
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c 'while true; do \
+    if grep -q closed /proc/acpi/button/lid/LID0/state; then \
+        echo 1 > /sys/class/backlight/intel_backlight/bl_power; \
+    else \
+        echo 0 > /sys/class/backlight/intel_backlight/bl_power; \
+    fi; \
+    sleep 1; done'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
