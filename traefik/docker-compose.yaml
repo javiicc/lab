@@ -1,0 +1,54 @@
+services:
+  traefik:
+    image: traefik:v3.3
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+      - 443:443
+    secrets:
+      - cf_token
+    env_file:
+      - .env
+    environment:
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_token                             # https://doc.traefik.io/traefik/https/acme/#providers
+      - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
+      # - CF_API_EMAIL=your@email.com # Cloudflare email
+      # - CF_DNS_API_TOKEN=YOUR-TOKEN # Cloudflare API Token
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /path-to/traefik/config/traefik.yaml:/traefik.yaml:ro
+      - /path-to/traefik/config/acme.json:/acme.json
+      - /path-to/traefik/config/config.yaml:/config.yaml:ro
+      - /path-to/traefik/logs:/var/log/traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.traefik-dashboard.entrypoints=web
+      - traefik.http.routers.traefik-dashboard.rule=Host(`traefik-dashboard.mydomain.xyz`)
+      - traefik.http.routers.traefiksecured-dashboard.entrypoints=websecure
+      - traefik.http.routers.traefiksecured-dashboard.rule=Host(`traefik-dashboard.mydomain.xyz`)
+      - traefik.http.routers.traefiksecured-dashboard.tls=true
+      - traefik.http.routers.traefiksecured-dashboard.tls.certresolver=cloudflare
+      - traefik.http.routers.traefiksecured-dashboard.tls.domains[0].main=mydomain.xyz
+      - traefik.http.routers.traefiksecured-dashboard.tls.domains[0].sans=*.mydomain.xyz
+      - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+      - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https
+      - traefik.http.routers.traefik-dashboard.middlewares=https-redirect
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}
+      - traefik.http.routers.traefiksecured-dashboard.middlewares=traefik-auth
+      - traefik.http.routers.traefiksecured-dashboard.service=api@internal
+    networks:
+      proxy:
+
+secrets:
+  cf_token:
+    file: ./cf_token
+
+networks:
+  proxy:
+    external: true

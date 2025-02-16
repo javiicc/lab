@@ -1,0 +1,40 @@
+# https://doc.traefik.io/traefik/reference/install-configuration/boot-environment/
+api:                                              # https://doc.traefik.io/traefik/reference/install-configuration/api-dashboard/#configuration-options
+  dashboard: true
+  debug: true
+entryPoints:                                      # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+serversTransport:                                 # https://doc.traefik.io/traefik/routing/overview/#insecureskipverify
+  insecureSkipVerify: true
+providers:                                        # https://doc.traefik.io/traefik/reference/install-configuration/providers/overview/
+  docker:                                         # https://doc.traefik.io/traefik/reference/install-configuration/providers/docker/
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  # file:                                           # https://doc.traefik.io/traefik/reference/install-configuration/providers/others/file/
+  #   filename: /config.yaml
+certificatesResolvers:                            # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
+  cloudflare:                                     # Responsible for getting SSL certificates
+    acme:
+      email: mi-cloudflare-email@example.com # mi-cloudflare-email@example.com
+      storage: acme.json
+      # caServer: https://acme-v02.api.letsencrypt.org/directory # production (default)
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging (testing)
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+
+log:                                              # https://doc.traefik.io/traefik/reference/install-configuration/observability/logs-and-accesslogs/
+  filePath: "/var/log/traefik/traefik.log"
+  level: "INFO"
+accessLog:
+  filePath: "/var/log/traefik/access.log"
