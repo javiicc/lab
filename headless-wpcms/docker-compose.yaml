@@ -1,0 +1,56 @@
+services:
+  wpcms:
+    image: wordpress:latest
+    container_name: wpcms
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: wpcms
+      WORDPRESS_DB_PASSWORD: strongpswd
+      WORDPRESS_DB_NAME: cmsdbfcta
+    volumes:
+      - ./wp_data:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.wpcms.entrypoints=web"
+      - "traefik.http.routers.wpcms.rule=Host(`wpcms.mydomain.xyz`)"
+      - "traefik.http.routers.wpcmssecured.entrypoints=websecure"
+      - "traefik.http.routers.wpcmssecured.rule=Host(`wpcms.mydomain.xyz`)"
+      - "traefik.http.routers.wpcmssecured.tls=true"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.wpcms.middlewares=https-redirect"
+      - "traefik.http.routers.wpcmssecured.service=wpcms"
+      - "traefik.http.services.wpcms.loadbalancer.server.port=80"
+    networks:
+      - proxy
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cmsdbfcta
+      MYSQL_USER: wpcms
+      MYSQL_PASSWORD: strongpswd
+      MYSQL_ROOT_PASSWORD: superstrongpswd
+    volumes:
+      - ./db_data:/var/lib/mysql
+    networks:
+      - proxy
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  wp_data:
+  db_data:
+
+networks:
+  proxy:
+    external: true
