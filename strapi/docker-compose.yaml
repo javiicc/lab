@@ -6,8 +6,8 @@ services:
     ports:
       - "1337:1337"
     environment:
-      # ADMIN_URL: tobemodified #ex. https://api.example.com/admin
-      # PUBLIC_URL: tobemodified #ex. https://api.example.com
+      ADMIN_URL: http://strapi.mydomain.xyz/admin #ex. https://api.example.com/admin
+      PUBLIC_URL: http://strapi.mydomain.xyz #ex. https://api.example.com
       # IMG_ORIGIN: "toBeModified1,toBeModified2" #ex. 'self',data:,blob:,api.example.com,market-assets.strapi.io
       # CORS_ORIGIN: "toBeModified1,toBeModified2" #ex. https://mywebsite.example.com,https://api.example.com
       # DATABASE_CLIENT: postgres
@@ -17,9 +17,9 @@ services:
       # DATABASE_USERNAME: tobemodified #ex. strapi
       # DATABASE_PASSWORD: tobemodified #ex. strapi
       # DATABASE_SSL: false
-      # JWT_SECRET: tobemodified #ex. JrWfVf/o9TbWQmpMgsJaYp==
-      # ADMIN_JWT_SECRET: tobemodified #ex. MCpf2/FMiCJthF5d6Qup6iG==
-      # APP_KEYS: toBeModified1,toBeModified2 #ex. w9/ZTuHUWNF2EP8gdfPcNn==,LqXKC52TsN/z/Y2rUGTa6m==,d7EKo2Tp9SiGf82ZqrmSnB==,TAu2SJx6BDc7aYUyqiwxKs==
+      JWT_SECRET: tobemodified #ex. JrWfVf/o9TbWQmpMgsJaYp==
+      ADMIN_JWT_SECRET: tobemodified #ex. MCpf2/FMiCJthF5d6Qup6iG==
+      APP_KEYS: tobemodified,tobemodified #ex. w9/ZTuHUWNF2EP8gdfPcNn==,LqXKC52TsN/z/Y2rUGTa6m==,d7EKo2Tp9SiGf82ZqrmSnB==,TAu2SJx6BDc7aYUyqiwxKs==
       # API_TOKEN_SALT: tobemodified #ex. j43/kBRfXULfPpJnzPCJzi==
       # TRANSFER_TOKEN_SALT: tobemodified #ex. GCX3NkRSyHrDxhfgwnmCm3==
       NODE_ENV: development # or production
