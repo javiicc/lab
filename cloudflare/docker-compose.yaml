@@ -1,0 +1,21 @@
+networks:
+  mynetwork:
+    external: true
+
+services:
+  cloudflaretunnel:
+    container_name: cloudflared
+    image: cloudflare/cloudflared:2025.2.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - TUNNEL_TOKEN=$TUNNEL_TOKEN
+    command: tunnel --no-autoupdate run
+#     volumes:
+#       - ./cloudflared:/etc/cloudflared
+    networks:
+      - mynetwork
+
+# volumes:
+#   cloudflared:
