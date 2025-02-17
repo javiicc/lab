@@ -1,56 +1,45 @@
+networks:
+  mynetwork:
+    external: true
+
 services:
+
   wpcms:
-    image: wordpress:latest
     container_name: wpcms
+    image: wordpress:6.7.2-php8.1-apache
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    ports:
-      - 80:80
     depends_on:
       - mysql
     environment:
-      WORDPRESS_DB_HOST: mysql
-      WORDPRESS_DB_USER: wpcms
-      WORDPRESS_DB_PASSWORD: strongpswd
-      WORDPRESS_DB_NAME: cmsdbfcta
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=$MYSQL_DATABASE
     volumes:
-      - ./wp_data:/var/www/html
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.wpcms.entrypoints=web"
-      - "traefik.http.routers.wpcms.rule=Host(`wpcms.mydomain.xyz`)"
-      - "traefik.http.routers.wpcmssecured.entrypoints=websecure"
-      - "traefik.http.routers.wpcmssecured.rule=Host(`wpcms.mydomain.xyz`)"
-      - "traefik.http.routers.wpcmssecured.tls=true"
-      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.wpcms.middlewares=https-redirect"
-      - "traefik.http.routers.wpcmssecured.service=wpcms"
-      - "traefik.http.services.wpcms.loadbalancer.server.port=80"
+      - ./wp:/var/www/html
     networks:
-      - proxy
+      - mynetwork
+    security_opt:
+      - no-new-privileges:true
+    user: "33:33"
 
   mysql:
     image: mysql:8.0
     container_name: mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: cmsdbfcta
-      MYSQL_USER: wpcms
-      MYSQL_PASSWORD: strongpswd
-      MYSQL_ROOT_PASSWORD: superstrongpswd
+      - MYSQL_DATABASE=$MYSQL_DATABASE
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
     volumes:
-      - ./db_data:/var/lib/mysql
+      - ./wp_db:/var/lib/mysql
     networks:
-      - proxy
+      - mynetwork
     security_opt:
       - no-new-privileges:true
+    user: "999:999"
 
 volumes:
-  wp_data:
-  db_data:
-
-networks:
-  proxy:
-    external: true
+  wp:
+  wp_db:
